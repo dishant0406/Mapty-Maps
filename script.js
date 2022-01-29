@@ -32,6 +32,8 @@ class Workout{
 
 class Running extends Workout {
 
+  type='running';
+
   constructor(coords, distance, duration, cadence){
 
     super(coords, distance, duration);
@@ -52,6 +54,8 @@ class Running extends Workout {
 
 
 class Cycling extends Workout {
+
+  type='cycling';
 
   constructor(coords, distance, duration, elevationGain){
 
@@ -76,6 +80,9 @@ class App{
 
   #map; 
   #mapevent;
+
+  //Workout Array
+  #workout = [];
 
   constructor(){
 
@@ -159,7 +166,7 @@ class App{
       const type = inputType.value;
       const distance = +inputDistance.value;
       const duration = +inputDuration.value;
-
+      let workouts;
 
       
         /*----------  CORRDINATES  ----------*/
@@ -196,10 +203,14 @@ class App{
 
         const cadence = +inputCadence.value;
 
+        //CHECKING THE ENTERIES
         if(!checknumber(distance, duration, cadence) || !checkpositive(distance, duration, cadence)){
           return alert("Input needs to a Number and Positive!");
         }
 
+        //creating and pushing a new workout
+        workouts = new Running(tempcords, distance, duration, cadence);
+        
       }
 
       //IF WORKOUT CYCLING CREATE CYCLING OBJECT
@@ -207,38 +218,54 @@ class App{
 
         const elevation = +inputElevation.value;
 
+
+        //CHECKING THE ENTERIES
         if(!checknumber(distance, duration, elevation) || !checkpositive(distance, duration)){
           return alert("Input needs to a Number and Positive!");
         }
 
+        //creating and pusing the workout
+        workouts = new Cycling(tempcords, distance, duration, elevation);
+        
+
       }
-    
+      
+      //PUSING THE WORKOUT IN THE ARRAY DEFINED IN THE ARRAY CLASS
+      this.#workout.push(workouts);
+      console.log(workouts);
+      console.log(this.#workout);
+
+      //RENDER WORKOUT MARKER ON THE MAP
+      this._renderWorkoutMarker(workouts);
+
       //EMPTY THE INPUT FIELD
       inputDistance.value =
       inputDuration.value =
       inputCadence.value =
       inputElevation.value = '';
     
-      
     
-      //CREATING A MARKER FOR CLICKED LOCATION
-      L.marker(tempcords).addTo(this.#map)
-    
-    
-      //EDITING THE POPUP 
-      .bindPopup(L.popup({
-        maxWidth: 200,
-        minWidth: 100,
-        closeButton: false,
-        autoClose: false,
-        closeOnClick: false,
-        className: 'running-popup',
-    
-      })
-      .setContent('Workout'))//SETTING CONTENT OF ON THE MARKER
-    
-      .openPopup();
-    
+  }
+
+
+  //FUNCTION TO RENDER WORKOUT ON THE MAP
+  _renderWorkoutMarker(workouts){
+    //CREATING A MARKER FOR CLICKED LOCATION
+    L.marker(workouts.coords).addTo(this.#map)
+
+    //EDITING THE POPUP 
+    .bindPopup(L.popup({
+      maxWidth: 200,
+      minWidth: 100,
+      closeButton: false,
+      autoClose: false,
+      closeOnClick: false,
+      className: `${workouts.type}-popup`,
+  
+    })
+    .setContent(workouts.distance +''))//SETTING CONTENT OF ON THE MARKER
+  
+    .openPopup();
   }
 }
 
