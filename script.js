@@ -17,7 +17,7 @@ class Workout{
 
   date = new Date();
   id = (Date.now() + '').slice(-10);
-  click = 0;
+  
 
 
   constructor(coords, distance, duration){
@@ -34,9 +34,7 @@ class Workout{
     this.discString = `${this.type[0].toUpperCase()}${this.type.slice(1)} on ${months[this.date.getMonth()]} ${this.date.getDate()}`;
   }
 
-  clickinc(){
-    this.click++;
-  }
+  
   
 }
 
@@ -111,6 +109,9 @@ class App{
 
     containerWorkouts.addEventListener('click', this._movetopop.bind(this));
 
+    //restore local storage items
+    this._restoreLocalStorage();
+
   }
 
   _getPosition() {
@@ -153,6 +154,12 @@ class App{
 
           //SETTING A MARKER ON THE CLICK LOCATION  
           this.#map.on('click', this.showForm.bind(this));
+
+
+          //render on side pane
+    this.#workout.forEach(w => {
+      this._renderWorkoutMarker(w);
+    });
     
   }
 
@@ -282,6 +289,9 @@ class App{
       
       //HIDE FORM
       this.hideForm();
+
+      //store data in the local storage
+      this._storeLocalStorage();
     
   }
 
@@ -380,9 +390,39 @@ class App{
       })
       
 
-      //increase the number of click
-      workout.clickinc();
-      console.log(workout.click);
+      
+  }
+
+
+  //FUNCTION TO STORE DATA IN THE LOCAL STORAGE USING LOCAL STORAGE API
+  _storeLocalStorage(){
+
+    //local storage api
+    localStorage.setItem('storedWorkout', JSON.stringify(this.#workout));
+  }
+
+  _restoreLocalStorage(){
+
+    //store the data from local storage to an array
+    const data = JSON.parse(localStorage.getItem('storedWorkout'));
+
+    //no data then return
+    if(!data) {return;}
+
+    //setting #workout to data
+    this.#workout = data;
+
+    //render on side pane
+    this.#workout.forEach(w => {
+      this._renderWorkoutOnPane(w);
+    });
+  }
+
+  reset(){
+
+    //reset the local storage
+    localStorage.removeItem('storedWorkout');
+    location.reload();
   }
 }
 
