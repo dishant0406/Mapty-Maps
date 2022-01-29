@@ -17,6 +17,7 @@ class Workout{
 
   date = new Date();
   id = (Date.now() + '').slice(-10);
+  click = 0;
 
 
   constructor(coords, distance, duration){
@@ -31,6 +32,10 @@ class Workout{
   _discriptionString(){
     const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
     this.discString = `${this.type[0].toUpperCase()}${this.type.slice(1)} on ${months[this.date.getMonth()]} ${this.date.getDate()}`;
+  }
+
+  clickinc(){
+    this.click++;
   }
   
 }
@@ -103,6 +108,8 @@ class App{
 
     //TOGGLING THE DISTANCE AND CADENCE ACCORDING TO THE WORKOUT
     inputType.addEventListener('change', this._toggleElevationField );
+
+    containerWorkouts.addEventListener('click', this._movetopop.bind(this));
 
   }
 
@@ -351,6 +358,31 @@ class App{
 
 
 
+  }
+
+  _movetopop(e){
+      const workoutel = e.target.closest('.workout');
+      
+
+      if(workoutel===null){
+        return;
+      }
+
+      const workout = this.#workout.find(work => work.id === workoutel.dataset.id);
+      
+
+      //SET VIEW ON THE MAP WITH LEAFTY
+      this.#map.setView(/*cordinates first*/ workout.coords, /*zoomlevel*/ 14, /*opject of options*/ {
+        animate: true,
+        pan:{
+          duration: 1
+        }
+      })
+      
+
+      //increase the number of click
+      workout.clickinc();
+      console.log(workout.click);
   }
 }
 
